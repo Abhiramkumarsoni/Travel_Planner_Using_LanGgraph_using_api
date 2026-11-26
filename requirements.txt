@@ -1,0 +1,26 @@
+﻿langgraph
+langchain-groq
+load_dotenv
+python-dotenv
+langchain_tavily
+tavily
+tavily-python
+langgraph
+langchain
+langchain-core
+langchain-openai
+langchain-groq
+langchain-community
+langchain-tavily
+langgraph-checkpoint-postgres
+psycopg[binary]
+psycopg-pool
+python-dotenv
+tavily-python
+requests
+streamlit
+tiktoken
+# for debugging
+langgraph-cli
+langgraph-cli[inmem]
+colorama

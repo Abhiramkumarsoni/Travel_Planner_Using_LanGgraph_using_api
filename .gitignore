@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python environments / bundled packages
+travel_agent/share/
+travel_agent/*.dll
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/

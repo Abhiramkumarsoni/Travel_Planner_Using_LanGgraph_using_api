@@ -11,8 +11,6 @@ CREATE DATABASE langgraph_memory;  ( or open pgadmin4 and create database there 
 import os
 from typing import TypedDict, Annotated
 import operator
-
-import psycopg
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.postgres import PostgresSaver
 from langchain_core.messages import (
@@ -31,9 +29,12 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is missing from .env")
+
 # LLM
 llm = ChatGroq(
-    model="llama-3.3-70b-versatile"
+    model="openai/gpt-oss-120b"
 )
 
 # State
@@ -102,7 +103,8 @@ def itinerary_agent(state: TravelState):
 def final_agent(state: TravelState):
 
     final_prompt = f"""
-    Generate final travel response.
+    Generate final travel response. in a user-friendly format. Include the following details:
+    User Query:
 
     Flights:
     {state['flight_results']}
@@ -139,17 +141,38 @@ graph.add_edge("final_agent", END)
 
 
 # Persistent connection so both CLI and Streamlit can share the compiled app
-_conn = psycopg.connect(DATABASE_URL)
-checkpointer = PostgresSaver(_conn)
+from psycopg.rows import dict_row
+from psycopg_pool import ConnectionPool
+
+pool = ConnectionPool(
+    conninfo=DATABASE_URL,
+    min_size=1,
+    max_size=5,
+    kwargs={
+        "autocommit": True,
+        "row_factory": dict_row
+    },
+     open=True
+)
+
+checkpointer = PostgresSaver(pool)
+
+# Initialize checkpoint tables
 checkpointer.setup()
 
-app = graph.compile(checkpointer=checkpointer)
+# Compile graph
+app = graph.compile(
+    checkpointer=checkpointer
+)
+
+print("PostgreSQL persistence initialized!")
+
 
 
 if __name__ == "__main__":
     config = {
         "configurable": {
-            "thread_id": "user_aarohi"
+            "thread_id": "abhiram"
         }
     }
 

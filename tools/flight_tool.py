@@ -55,6 +55,7 @@ Airline: {airline}
 Departure: {departure}
 Arrival: {arrival}
 Status: {status}
+time: {flight.get("departure", {}).get("estimated", "Unknown")}
 """
             )
 
